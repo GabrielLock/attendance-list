@@ -1,22 +1,33 @@
 import React, { useState, useEffect} from 'react'
 import './styles.css'
 
-import {Card} from '../../components/Card'
+import {Card, CardProps} from '../../components/Card'
+
+type ProfileResponse = {
+  login: string
+  avatar_url: string
+}
+
+type User = {
+  login: string
+  avatar: string
+}
 
 export function Home() {
-  const [studentName, setStudentName] = useState()
-  const [students, setStudents] = useState([])
-  const [user, setUser] = useState({ name:'', avatar:''})
+  const [studentName, setStudentName] = useState<string>()
+  const [students, setStudents] = useState<CardProps[]>([])
+  const [user, setUser] = useState<User>({} as User)
 
   function hanleAddStudent(){
     const newStudent = {
-      name: studentName,
+      name: studentName || '' ,
       time: new Date().toLocaleTimeString('pt-br', {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
       })
     }
+    
       setStudents(prevState => [...prevState, newStudent])
   }
   useEffect(() => {
@@ -30,9 +41,11 @@ export function Home() {
     // })
     async function fetchData(){
       const response = await fetch('https://api.github.com/users/GabrielLock')
-      const data = await response.json()
+      const data = (await response.json()) as ProfileResponse
+      console.log("DADOS ===>", data)
+      
       setUser({
-        name: data.login,
+        login: data.login,
         avatar: data.avatar_url,
       })
     }
@@ -43,7 +56,7 @@ export function Home() {
     <header>
     <h1>Lista de Presença</h1>
     <div>
-      <strong>{user.name}</strong>
+      <strong>{user.login}</strong>
       <img src={user.avatar} alt="Foto de perfil" />
     </div>
     </header>
